@@ -11,6 +11,7 @@ export = (app: Probot) => {
       "check_run.rerequested"
     ],
     async (context: Context) => {
+      console.log('ASYNC', context)
       try {
         validateCommitSignatures(context)
       } catch (error) {
