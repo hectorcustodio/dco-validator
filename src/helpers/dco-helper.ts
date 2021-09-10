@@ -17,14 +17,44 @@ const validateCommitSignatures = (context: Context) => {
     return octokit.request({ method: "GET", url: commitsUrl })
   }
 
-  const checkCommitsVerification = (commits: Array<Commit>) => {
+  const checkCommitsGpgVerification = (commits: Array<Commit>) => {
     console.log("Commits", commits)
     return commits
       .filter(({ commit }) => !commit.verification.verified)
       .map((commit) => commit.sha)
   }
 
-  const createFailedCheckVerification = (failedCommits: string[]) => {
+  const checkCommitsSignOff = (commits: Array<Commit>) => {
+    const re = /(Signed-off-by:\s*)(.+)<(.+@.+)>/
+    console.log('COmmits', commits)
+
+    return commits.filter((commit) => {
+      const { commit: commitDetail } = commit
+      const match = re.exec(commitDetail.message)
+      console.log('Message', commitDetail.message)
+      console.log('Match', match)
+      if (!match) return commit
+
+
+      const [_full, _sign, author, email] = match
+
+      if (commitDetail.author.name !== author.trim() || commitDetail.author.email !== email)
+        return commit
+
+      return null
+
+    }).map(commit => commit.sha)
+
+  }
+
+  const createFailedCheckVerification = (...failedCommits: Array<Array<string>>) => {
+
+    const [notSigned, notVerified] = failedCommits
+
+    const message = `Problems were found in some of your commits:\n
+    ${notSigned.length ? `Sign Off not Found :\n ${notSigned.map(commitSha => `\n ${commitSha}`).join(' ')}` : ''}
+    ${notVerified.length ? `\nGPG Verification not Found:\n ${notVerified.map(commitSha => `\n ${commitSha}`).join(' ')}` : ''}
+    `
 
     const failureStatus: StatusCheck = {
       ...status,
@@ -32,8 +62,7 @@ const validateCommitSignatures = (context: Context) => {
       completed_at: new Date(),
       output: {
         title: 'Failed Validation',
-        summary: `Some of your commits are not verified
-        ${failedCommits.map(commitSha => `\n ${commitSha}`)}`
+        summary: message
       }
     }
 
@@ -57,13 +86,25 @@ const validateCommitSignatures = (context: Context) => {
   }
 
   const start = async () => {
-    const config = await context.config('dco-validation.yml')
-    
-    console.log('CONFIG', config)
+    const config = await context.config('dco-validation.yml', {
+      verify: {
+        gpg: false
+      }
+    })
+    const shouldVerifyGpg = config && config.verify.gpg
+    let notSignedCommits: string[] = []
+    let notGpgVerifiedCommits: string[] = []
+
+
     const { data: prCommits } = await loadCommitsForPullRequest(pr.commits_url)
-    const notGpgVerified = checkCommitsVerification(prCommits)
-    if (notGpgVerified.length)
-      return createFailedCheckVerification(notGpgVerified)
+
+    notSignedCommits = checkCommitsSignOff(prCommits)
+
+    if (shouldVerifyGpg)
+      notGpgVerifiedCommits = checkCommitsGpgVerification(prCommits)
+
+    if (notSignedCommits.length || notGpgVerifiedCommits.length)
+      return createFailedCheckVerification(notSignedCommits, notGpgVerifiedCommits)
 
     return createSuccessCheckVerification()
   }
