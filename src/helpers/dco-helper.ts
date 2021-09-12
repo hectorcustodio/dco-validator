@@ -1,5 +1,5 @@
 import { Context } from "probot";
-import { Commit, StatusCheck } from "../models/models";
+import { Commit, StatusCheck } from "../models";
 
 const validateCommitSignatures = (context: Context) => {
   const { payload, octokit } = context
@@ -51,9 +51,11 @@ const validateCommitSignatures = (context: Context) => {
 
     const [notSigned, notVerified] = failedCommits
 
-    const message = `Problems were found in some of your commits:\n
-    ${notSigned.length ? `Sign Off not Found :\n ${notSigned.map(commitSha => `\n ${commitSha}`).join(' ')}` : ''}
-    ${notVerified.length ? `\nGPG Verification not Found:\n ${notVerified.map(commitSha => `\n ${commitSha}`).join(' ')}` : ''}
+    const message = `Problems were found in some of your commits:
+    ${notSigned.length ? `Some commits are incorrectly signed off :
+      ${notSigned.map(commitSha => `\n ${commitSha}`).join(' ')}` : ''}
+    ${notVerified.length ? `\nGPG Verification not found for some commits:
+      ${notVerified.map(commitSha => `\n ${commitSha}`).join(' ')}` : ''}
     `
 
     const failureStatus: StatusCheck = {
