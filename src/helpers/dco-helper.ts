@@ -52,6 +52,7 @@ const validateCommitSignatures = (context: Context) => {
     const [notSigned, notVerified] = failedCommits
 
     const message = `Problems were found in some of your commits:
+    
     ${notSigned.length ? `Some commits are incorrectly signed off :
       ${notSigned.map(commitSha => `\n ${commitSha}`).join(' ')}` : ''}
     ${notVerified.length ? `\nGPG Verification not found for some commits:
