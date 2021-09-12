@@ -78,7 +78,7 @@ const validateCommitSignatures = (context: Context) => {
       completed_at: new Date(),
       output: {
         title: 'Successful Validation',
-        summary: `Congrats all your commits are verified!`
+        summary: `Congrats, all your commits are signed!`
       }
     }
 
