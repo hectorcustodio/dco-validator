@@ -1,8 +1,23 @@
-# dco-validator
+# DCO / GPG Validator
 
 > A GitHub App built with [Probot](https://github.com/probot/probot) that A Probot app
 
-## Setup
+## What is this App for?
+
+This app helps you check pull request commits signatures for DCO (Developer Certificate of Origin) and GPG verification
+
+For default, GPG validation is disabled but you can easily change that:
+
+Inside the .github folder of your default branch, create the following file:
+
+dco-validation.yml
+```sh
+#enables gpg verification
+verify:
+  gpg: true
+```
+
+## Local Setup
 
 ```sh
 # Install dependencies
