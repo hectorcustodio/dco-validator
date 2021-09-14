@@ -47,7 +47,7 @@ const validateCommitSignatures = (context: Context) => {
 
   }
 
-  const createFailedCheckVerification = (...failedCommits: Array<Array<string>>) => {
+  const createFailedCheckVerification = async (...failedCommits: Array<Array<string>>) => {
 
     const [notSigned, notVerified] = failedCommits
 
@@ -67,7 +67,9 @@ const validateCommitSignatures = (context: Context) => {
       }
     }
 
-    return octokit.checks.create(context.repo({ ...failureStatus }))
+    const res = await octokit.checks.create(context.repo({ ...failureStatus }))
+    console.log('RESPONSE', res)
+    // return octokit.checks.create(context.repo({ ...failureStatus }))
   }
 
   const createSuccessCheckVerification = () => {
