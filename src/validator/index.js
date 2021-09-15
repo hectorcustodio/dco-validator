@@ -7,14 +7,20 @@ const validateCommitSignatures = async () => {
   const { payload, repo, runId } = github.context
   const { pull_request: pr } = payload
 
-  let options = {
-    ...repo,
-    check_suite_id: runId,
-    method: 'GET',
-    url: "/repos/{owner}/{repo}/check-suites/{check_suite_id}/check-runs"
+
+  try {
+    let options = {
+      ...repo,
+      check_suite_id: runId,
+      method: 'GET',
+      url: "/repos/{owner}/{repo}/check-suites/{check_suite_id}/check-runs"
+    }
+    const res = await octokit.request(options)
+    console.log('SUITE', res)
+
+  } catch (error) {
+    console.log('ERROR', error)
   }
-  const res = await octokit.request(options)
-  console.log('SUITE', res)
 
 
   const status = {
