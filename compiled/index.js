@@ -5670,7 +5670,7 @@ function wrappy (fn, cb) {
 
 const github = __nccwpck_require__(5438);
 
-const BASE_URL = "api.github.com/repos/{owner}/{repo}/check-runs"
+const BASE_URL = "/repos/{owner}/{repo}/check-runs"
 
 const validateCommitSignatures = () => {
   const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
