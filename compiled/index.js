@@ -5670,22 +5670,15 @@ function wrappy (fn, cb) {
 
 const github = __nccwpck_require__(5438);
 
-const BASE_URL = "/repos/{owner}/{repo}/check-runs"
-
 const validateCommitSignatures = async () => {
   const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
-  const { payload, repo, runId } = github.context
+  const { payload, repo, sha } = github.context
   const { pull_request: pr } = payload
 
 
   try {
-    let options = {
-      ...repo,
-      check_suite_id: runId,
-      method: 'GET',
-      url: "/repos/{owner}/{repo}/check-suites/{check_suite_id}/check-runs"
-    }
-    const res = await octokit.request(options)
+    
+    const res = octokit.rest.checks.listForRef({...repo, sha})
     console.log('SUITE', res)
 
   } catch (error) {
@@ -5742,9 +5735,8 @@ const validateCommitSignatures = async () => {
       ${notVerified.map(commitSha => `\n ${commitSha}`).join(' ')}` : ''}
     `
 
-    const failureOptions = {
+    const failureStatus = {
       ...status,
-      method: 'POST',
       conclusion: 'failure',
       completed_at: new Date(),
       output: {
@@ -5753,15 +5745,14 @@ const validateCommitSignatures = async () => {
       }
     }
 
-    const res = await octokit.request({ ...failureOptions, url: BASE_URL })
+    const res = await octokit.rest.checks.create(failureStatus)
     console.log('RESPONSE', res)
   }
 
   const createSuccessCheckVerification = () => {
 
-    const successOptions = {
+    const successStatus = {
       ...status,
-      method: 'POST',
       conclusion: 'success',
       completed_at: new Date(),
       output: {
@@ -5770,7 +5761,7 @@ const validateCommitSignatures = async () => {
       }
     }
 
-    return octokit.request({ ...successOptions, url: BASE_URL })
+    return octokit.rest.checks.create(successStatus)
 
   }
 

@@ -2,18 +2,13 @@ const github = require('@actions/github');
 
 const validateCommitSignatures = async () => {
   const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
-  const { payload, repo, runId } = github.context
+  const { payload, repo, sha } = github.context
   const { pull_request: pr } = payload
 
 
   try {
-    let options = {
-      ...repo,
-      check_suite_id: runId,
-      method: 'GET',
-      url: "/repos/{owner}/{repo}/check-suites/{check_suite_id}/check-runs"
-    }
-    const res = await octokit.request(options)
+    
+    const res = octokit.rest.checks.listForRef({...repo, sha})
     console.log('SUITE', res)
 
   } catch (error) {
