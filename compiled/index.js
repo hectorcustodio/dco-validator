@@ -5672,12 +5672,22 @@ const github = __nccwpck_require__(5438);
 
 const BASE_URL = "/repos/{owner}/{repo}/check-runs/{check_run_id}"
 
-const validateCommitSignatures = () => {
+const validateCommitSignatures = async () => {
   const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
   const { payload, repo, runId } = github.context
   const { pull_request: pr } = payload
 
   console.log('CONTEXT', github.context)
+
+
+  let options = {
+    ...repo,
+    check_suite_id: runId,
+    method: 'GET',
+    url: "/repos/{owner}/{repo}/check-suites/{check_suite_id}/check-runs"
+  }
+  const res = await octokit.request(options)
+  console.log('SUITE', res)
 
 
   const status = {
