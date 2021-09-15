@@ -1,14 +1,11 @@
 const github = require('@actions/github');
 
-const BASE_URL = "/repos/{owner}/{repo}/check-runs/{check_run_id}"
+const BASE_URL = "/repos/{owner}/{repo}/check-runs"
 
 const validateCommitSignatures = async () => {
   const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
   const { payload, repo, runId } = github.context
   const { pull_request: pr } = payload
-
-  console.log('CONTEXT', github.context)
-
 
   let options = {
     ...repo,
@@ -22,7 +19,6 @@ const validateCommitSignatures = async () => {
 
   const status = {
     name: 'DCO / GPG Validator result',
-    check_run_id: runId,
     head_branch: pr.head.ref,
     head_sha: pr.head.sha,
     status: 'completed',
@@ -72,7 +68,7 @@ const validateCommitSignatures = async () => {
 
     const failureOptions = {
       ...status,
-      method: 'PATCH',
+      method: 'POST',
       conclusion: 'failure',
       completed_at: new Date(),
       output: {
@@ -89,7 +85,7 @@ const validateCommitSignatures = async () => {
 
     const successOptions = {
       ...status,
-      method: 'PACTH',
+      method: 'POST',
       conclusion: 'success',
       completed_at: new Date(),
       output: {
