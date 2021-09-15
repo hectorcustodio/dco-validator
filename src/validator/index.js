@@ -67,7 +67,8 @@ const validateCommitSignatures = () => {
       }
     }
 
-    return octokit.request({ ...failureOptions, url: BASE_URL })
+    const res = octokit.request({ ...failureOptions, url: BASE_URL })
+    console.log('RESPONSE', res)
   }
 
   const createSuccessCheckVerification = () => {
