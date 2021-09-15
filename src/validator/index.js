@@ -46,7 +46,7 @@ const validateCommitSignatures = () => {
 
   }
 
-  const createFailedCheckVerification = (...failedCommits) => {
+  const createFailedCheckVerification = async (...failedCommits) => {
 
     const [notSigned, notVerified] = failedCommits
 
@@ -67,7 +67,7 @@ const validateCommitSignatures = () => {
       }
     }
 
-    const res = octokit.request({ ...failureOptions, url: BASE_URL })
+    const res = await octokit.request({ ...failureOptions, url: BASE_URL })
     console.log('RESPONSE', res)
   }
 
