@@ -10,3 +10,5 @@ function validateDCOSignature(){
   console.log('CONTEXT', context)
   
 }
+
+validateDCOSignature()

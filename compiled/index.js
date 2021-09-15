@@ -9528,6 +9528,8 @@ function validateDCOSignature(){
   console.log('CONTEXT', context)
   
 }
+
+validateDCOSignature()
 })();
 
 module.exports = __webpack_exports__;
