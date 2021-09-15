@@ -1,35 +1,20 @@
 {
   "name": "dco-validator",
   "version": "1.0.0",
-  "private": true,
-  "description": "A Probot app",
-  "author": "Hector Custódio <hectorcustodio@outlook.com.br>",
-  "license": "ISC",
-  "homepage": "https://github.com/hectorcustodio/dco-validator",
-  "keywords": [
-    "probot",
-    "github",
-    "probot-app"
-  ],
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "postinstall": "tsc",
-    "start": "probot run ./lib/index.js",
-    "test": "jest"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "\turl =git@github.com-hectorcustodio:hectorcustodio/dco-validator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "probot": "^11.0.1"
-  },
-  "devDependencies": {
-    "@types/jest": "^26.0.19",
-    "@types/node": "^14.14.19",
-    "jest": "^26.6.3",
-    "nock": "^13.0.5",
-    "smee-client": "^1.2.2",
-    "ts-jest": "^26.4.4",
-    "typescript": "^4.1.3"
-  },
-  "engines": {
-    "node": ">= 10.13.0"
+    "@actions/core": "^1.5.0",
+    "@actions/github": "^5.0.0"
   }
 }

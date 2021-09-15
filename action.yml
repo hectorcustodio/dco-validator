@@ -1,0 +1,5 @@
+name: 'DCO / GPG Validator'
+description: 'Checks signed off line and gpg verification for commits'
+runs:
+  using: 'node12'
+  main: 'src/index.js'
