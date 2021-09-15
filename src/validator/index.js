@@ -114,4 +114,4 @@ const validateCommitSignatures = () => {
 
 }
 
-export default validateCommitSignatures
+module.exports = validateCommitSignatures
