@@ -6,7 +6,7 @@ const validateCommitSignatures = async () => {
   const { pull_request: pr } = payload
 
   const status = {
-    name: 'DCO / GPG Validator result',
+    name: 'Result',
     head_branch: pr.head.ref,
     head_sha: pr.head.sha,
     status: 'completed',
