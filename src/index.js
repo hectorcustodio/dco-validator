@@ -1,14 +1,7 @@
-const core = require('@actions/core');
-const github = require('@actions/github');
+const validateCommitSignatures = require('./validator')
 
-
-
-function validateDCOSignature(){
-  const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
-  const context = github.context
-
-  console.log('CONTEXT', context)
-  
+try {
+  validateCommitSignatures()
+} catch (error) {
+  console.log('ERROR', error)
 }
-
-validateDCOSignature()
