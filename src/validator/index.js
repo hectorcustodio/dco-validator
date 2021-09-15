@@ -5,17 +5,6 @@ const validateCommitSignatures = async () => {
   const { payload, repo, sha } = github.context
   const { pull_request: pr } = payload
 
-
-  try {
-    
-    const res = octokit.rest.checks.listForRef({...repo, sha})
-    console.log('SUITE', res)
-
-  } catch (error) {
-    console.log('ERROR', error)
-  }
-
-
   const status = {
     name: 'DCO / GPG Validator result',
     head_branch: pr.head.ref,
@@ -75,8 +64,7 @@ const validateCommitSignatures = async () => {
       }
     }
 
-    const res = await octokit.rest.checks.create(failureStatus)
-    console.log('RESPONSE', res)
+    return octokit.rest.checks.create(failureStatus)
   }
 
   const createSuccessCheckVerification = () => {
