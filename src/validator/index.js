@@ -5,9 +5,6 @@ const validateCommitSignatures = async () => {
   const { payload, repo, eventName, sha, ref } = github.context
   const { pull_request: pr } = payload
 
-  console.log('Context', github.context)
-  console.log('Payload', payload)
-
   if (pr !== undefined) {
     sha = pr.head.sha
     ref = pr.head.ref
@@ -116,7 +113,7 @@ const validateCommitSignatures = async () => {
   }
 
   if (eventName === 'pull_request') {
-    start()
+    return start()
   } else {
 
     const failedCheck = {
