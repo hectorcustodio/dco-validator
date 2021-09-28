@@ -5672,19 +5672,16 @@ const github = __nccwpck_require__(5438);
 
 const validateCommitSignatures = async () => {
   const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
-  const { payload, repo, eventName } = github.context
+  const { payload, repo, eventName, sha, ref } = github.context
   const { pull_request: pr } = payload
 
   console.log('Context', github.context)
   console.log('Payload', payload)
 
-  if (eventName !== 'pull_request')
-    console.log('NOT PULL REQUEST')
-
   const status = {
     name: 'Result',
-    head_branch: pr.head.ref,
-    head_sha: pr.head.sha,
+    head_branch: ref,
+    head_sha: sha,
     status: 'completed',
     started_at: new Date(),
     ...repo
@@ -5719,6 +5716,7 @@ const validateCommitSignatures = async () => {
     }).map(commit => commit.sha)
 
   }
+
 
   const createFailedCheckVerification = async (...failedCommits) => {
 
@@ -5782,7 +5780,23 @@ const validateCommitSignatures = async () => {
     return createSuccessCheckVerification()
   }
 
-  start()
+  if (eventName === 'pull_request') {
+    start()
+  } else {
+
+    const failedCheck = {
+      ...status,
+      conclusion: 'failure',
+      completed_at: new Date(),
+      output: {
+        title: 'Failed Validation',
+        summary: 'Please, make sure you are using the correct configuration for this action. https://github.com/ZupIT/zup-dco-validator'
+      }
+    }
+
+    return octokit.rest.checks.create(failedCheck)
+  }
+
 
 }
 
