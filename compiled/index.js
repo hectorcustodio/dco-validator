@@ -5680,8 +5680,8 @@ const validateCommitSignatures = async () => {
 
   const status = {
     name: 'Result',
-    head_branch: ref,
-    head_sha: sha,
+    head_branch: pr ? pr.head.ref : ref,
+    head_sha: pr ? pr.head.sha : sha,
     status: 'completed',
     started_at: new Date(),
     ...repo
