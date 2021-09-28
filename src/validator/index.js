@@ -8,10 +8,15 @@ const validateCommitSignatures = async () => {
   console.log('Context', github.context)
   console.log('Payload', payload)
 
+  if (pr !== undefined) {
+    sha = pr.head.sha
+    ref = pr.head.ref
+  }
+
   const status = {
     name: 'Result',
-    head_branch: pr != undefined ? pr.head.ref : ref,
-    head_sha: pr != undefined ? pr.head.sha : sha,
+    head_branch: ref,
+    head_sha: sha,
     status: 'completed',
     started_at: new Date(),
     ...repo
