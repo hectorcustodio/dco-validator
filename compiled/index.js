@@ -5672,11 +5672,14 @@ const github = __nccwpck_require__(5438);
 
 const validateCommitSignatures = async () => {
   const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
-  const { payload, repo} = github.context
+  const { payload, repo, eventName } = github.context
   const { pull_request: pr } = payload
 
   console.log('Context', github.context)
   console.log('Payload', payload)
+
+  if (eventName !== 'pull_request')
+    console.log('NOT PULL REQUEST')
 
   const status = {
     name: 'Result',
