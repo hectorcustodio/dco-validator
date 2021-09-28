@@ -1,6 +1,6 @@
 const github = require('@actions/github');
 
-const validateCommitSignatures = async () => {
+const validateCommitSignatures = () => {
   const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
   let { payload, repo, eventName, sha, ref } = github.context
   const { pull_request: pr } = payload
