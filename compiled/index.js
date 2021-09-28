@@ -5720,7 +5720,7 @@ const validateCommitSignatures = () => {
   }
 
 
-  const createFailedCheckVerification = async (...failedCommits) => {
+  const createFailedCheckVerification = (...failedCommits) => {
 
     const [notSigned, notVerified] = failedCommits
 
