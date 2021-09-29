@@ -6267,27 +6267,23 @@ const validateCommitSignatures = () => {
   }
 
   const start = async () => {
-    try {
-      const shouldVerifyGpg = process.env.VALIDATE_GPG || false
-      let notSignedCommits = []
-      let notGpgVerifiedCommits = []
+    const shouldVerifyGpg = process.env.VALIDATE_GPG || false
+    let notSignedCommits = []
+    let notGpgVerifiedCommits = []
 
-      const { data: prCommits } = await loadCommitsForPullRequest(pr.commits_url)
+    const { data: prCommits } = await loadCommitsForPullRequest(pr.commits_url)
 
-      notSignedCommits = checkCommitsSignOff(prCommits)
+    notSignedCommits = checkCommitsSignOff(prCommits)
 
-      console.log(shouldVerifyGpg);
+    console.log(shouldVerifyGpg);
 
-      if (shouldVerifyGpg === true)
-        notGpgVerifiedCommits = checkCommitsGpgVerification(prCommits)
+    if (shouldVerifyGpg == true)
+      notGpgVerifiedCommits = checkCommitsGpgVerification(prCommits)
 
-      if (notSignedCommits.length || notGpgVerifiedCommits.length)
-        createFailedCheckVerification(notSignedCommits, notGpgVerifiedCommits)
+    if (notSignedCommits.length || notGpgVerifiedCommits.length)
+      createFailedCheckVerification(notSignedCommits, notGpgVerifiedCommits)
 
-      createSuccessCheckVerification()
-    } catch (error) {
-      createCheckErrorForFailedAction()
-    }
+    createSuccessCheckVerification()
 
   }
 
