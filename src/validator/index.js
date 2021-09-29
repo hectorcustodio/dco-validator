@@ -1,4 +1,5 @@
 const github = require('@actions/github');
+const core = require('@actions/core');
 
 const validateCommitSignatures = () => {
   const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
@@ -60,62 +61,40 @@ const validateCommitSignatures = () => {
       ${notVerified.map(commitSha => `\n ${commitSha}`).join(' ')}` : ''}
     `
 
-    const failureStatus = {
-      ...status,
-      conclusion: 'failure',
-      completed_at: new Date(),
-      output: {
-        title: 'Failed Validation - Problems were found in some of your commits',
-        summary: message
-      }
-    }
+    // const failureStatus = {
+    //   ...status,
+    //   conclusion: 'failure',
+    //   completed_at: new Date(),
+    //   output: {
+    //     title: 'Failed Validation - Problems were found in some of your commits',
+    //     summary: message
+    //   }
+    // }
 
-    return octokit.rest.checks.create(failureStatus)
+    // return octokit.rest.checks.create(failureStatus)
+
+    core.setFailed(message)
   }
 
   const createSuccessCheckVerification = () => {
 
-    const successStatus = {
-      ...status,
-      conclusion: 'success',
-      completed_at: new Date(),
-      output: {
-        title: 'Successful Validation',
-        summary: `Congrats, all your commits are signed!`
-      }
-    }
+    // const successStatus = {
+    //   ...status,
+    //   conclusion: 'success',
+    //   completed_at: new Date(),
+    //   output: {
+    //     title: 'Successful Validation',
+    //     summary: `Congrats, all your commits are signed!`
+    //   }
+    // }
 
-    return octokit.rest.checks.create(successStatus)
+    // return octokit.rest.checks.create(successStatus)
+
+     core.setOutput("Success", "All your commits are signed")
 
   }
 
-  const start = async () => {
-    const shouldVerifyGpg = process.env.VALIDATE_GPG || false
-    let notSignedCommits = []
-    let notGpgVerifiedCommits = []
-
-
-    const { data: prCommits } = await loadCommitsForPullRequest(pr.commits_url)
-
-    notSignedCommits = checkCommitsSignOff(prCommits)
-    console.log('NOT SIGNED COMMITS', notSignedCommits)
-
-
-    if (shouldVerifyGpg)
-      notGpgVerifiedCommits = checkCommitsGpgVerification(prCommits)
-
-    console.log('NOT GPG VERIFIED COMMITS', notGpgVerifiedCommits)
-
-    if (notSignedCommits.length || notGpgVerifiedCommits.length)
-      return await createFailedCheckVerification(notSignedCommits, notGpgVerifiedCommits)
-
-    return createSuccessCheckVerification()
-  }
-
-  if (eventName === 'pull_request') {
-    return start()
-  } else {
-
+  const createCheckErrorForFailedAction = () => {
     const failedCheck = {
       ...status,
       conclusion: 'failure',
@@ -127,6 +106,40 @@ const validateCommitSignatures = () => {
     }
 
     return octokit.rest.checks.create(failedCheck)
+  }
+
+  const start = async () => {
+    try {
+      const shouldVerifyGpg = process.env.VALIDATE_GPG || false
+      let notSignedCommits = []
+      let notGpgVerifiedCommits = []
+
+
+      const { data: prCommits } = await loadCommitsForPullRequest(pr.commits_url)
+
+      notSignedCommits = checkCommitsSignOff(prCommits)
+      console.log('NOT SIGNED COMMITS', notSignedCommits)
+
+
+      if (shouldVerifyGpg)
+        notGpgVerifiedCommits = checkCommitsGpgVerification(prCommits)
+
+      console.log('NOT GPG VERIFIED COMMITS', notGpgVerifiedCommits)
+
+      if (notSignedCommits.length || notGpgVerifiedCommits.length)
+        createFailedCheckVerification(notSignedCommits, notGpgVerifiedCommits)
+
+      createSuccessCheckVerification()
+    } catch (error) {
+      createCheckErrorForFailedAction()
+    }
+
+  }
+
+  if (eventName === 'pull_request') {
+    start()
+  } else {
+    createCheckErrorForFailedAction()
   }
 
 
