@@ -82,12 +82,12 @@ const validateCommitSignatures = () => {
 
   const createSuccessCheckVerification = () => {
 
-    core.info("Success", "All your commits are signed")
+    core.info("Congratulations!!! All your commits are signed")
 
   }
 
   const createCheckErrorForFailedAction = () => {
-    core.warning('Validation error. Please, make sure you are using the correct configuration for this action. https://github.com/ZupIT/zup-dco-validator')
+    core.setFailed('Validation error. Please, make sure you are using the correct configuration for this action. https://github.com/ZupIT/zup-dco-validator')
   }
 
   const start = async () => {
@@ -101,7 +101,7 @@ const validateCommitSignatures = () => {
 
     console.log(shouldVerifyGpg);
 
-    if (shouldVerifyGpg == true)
+    if (shouldVerifyGpg === 'true')
       notGpgVerifiedCommits = checkCommitsGpgVerification(prCommits)
 
     if (notSignedCommits.length || notGpgVerifiedCommits.length)
