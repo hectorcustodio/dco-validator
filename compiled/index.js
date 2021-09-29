@@ -6201,6 +6201,7 @@ const validateCommitSignatures = () => {
   }
 
   const checkCommitsGpgVerification = (commits) => {
+    console.log("GPG verification");
     return commits
       .filter(({ commit }) => !commit.verification.verified)
       .map((commit) => commit.sha)
@@ -6262,7 +6263,7 @@ const validateCommitSignatures = () => {
   }
 
   const createCheckErrorForFailedAction = () => {
-    core.setOutput('Please, make sure you are using the correct configuration for this action. https://github.com/ZupIT/zup-dco-validator')
+    core.warning('Validation error. Please, make sure you are using the correct configuration for this action. https://github.com/ZupIT/zup-dco-validator')
   }
 
   const start = async () => {
@@ -6274,6 +6275,8 @@ const validateCommitSignatures = () => {
       const { data: prCommits } = await loadCommitsForPullRequest(pr.commits_url)
 
       notSignedCommits = checkCommitsSignOff(prCommits)
+
+      console.log(shouldVerifyGpg);
 
       if (shouldVerifyGpg === true)
         notGpgVerifiedCommits = checkCommitsGpgVerification(prCommits)
