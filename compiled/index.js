@@ -6179,22 +6179,9 @@ const core = __nccwpck_require__(2186);
 
 const validateCommitSignatures = () => {
   const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
-  let { payload, repo, eventName, sha, ref } = github.context
+  let { payload, eventName } = github.context
   const { pull_request: pr } = payload
 
-  if (pr !== undefined) {
-    sha = pr.head.sha
-    ref = pr.head.ref
-  }
-
-  const status = {
-    name: 'Result',
-    head_branch: ref,
-    head_sha: sha,
-    status: 'completed',
-    started_at: new Date(),
-    ...repo
-  }
 
   const loadCommitsForPullRequest = (commitsUrl) => {
     return octokit.request({ method: "GET", url: commitsUrl })
@@ -6238,21 +6225,6 @@ const validateCommitSignatures = () => {
       ${notVerified.map(commitSha => `\n ${commitSha}`).join(' ')}` : ''}
     `
     core.setFailed(message)
-
-
-    const failureStatus = {
-      ...status,
-      conclusion: 'failure',
-      completed_at: new Date(),
-      output: {
-        title: 'Failed Validation - Problems were found in some of your commits',
-        summary: message
-      }
-    }
-
-    octokit.rest.checks.create(failureStatus).catch(() => {
-      core.setFailed("Verification finished")
-    })
 
   }
 
