@@ -73,10 +73,10 @@ const validateCommitSignatures = () => {
         }
       }
 
-      return octokit.rest.checks.create(failureStatus)
+      octokit.rest.checks.create(failureStatus)
 
     } catch (error) {
-      core.setFailed(message)
+      core.setFailed("Verification finished")
     }
 
   }
@@ -101,7 +101,7 @@ const validateCommitSignatures = () => {
 
       notSignedCommits = checkCommitsSignOff(prCommits)
 
-      if (shouldVerifyGpg)
+      if (shouldVerifyGpg === true)
         notGpgVerifiedCommits = checkCommitsGpgVerification(prCommits)
 
       if (notSignedCommits.length || notGpgVerifiedCommits.length)
