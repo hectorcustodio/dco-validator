@@ -6236,52 +6236,35 @@ const validateCommitSignatures = () => {
     ${notVerified.length ? `\nGPG Verification not found for some commits :
       ${notVerified.map(commitSha => `\n ${commitSha}`).join(' ')}` : ''}
     `
-
-    // const failureStatus = {
-    //   ...status,
-    //   conclusion: 'failure',
-    //   completed_at: new Date(),
-    //   output: {
-    //     title: 'Failed Validation - Problems were found in some of your commits',
-    //     summary: message
-    //   }
-    // }
-
-    // return octokit.rest.checks.create(failureStatus)
-
     core.setFailed(message)
+
+    try {
+      const failureStatus = {
+        ...status,
+        conclusion: 'failure',
+        completed_at: new Date(),
+        output: {
+          title: 'Failed Validation - Problems were found in some of your commits',
+          summary: message
+        }
+      }
+
+      return octokit.rest.checks.create(failureStatus)
+
+    } catch (error) {
+      core.setFailed(message)
+    }
+
   }
 
   const createSuccessCheckVerification = () => {
 
-    // const successStatus = {
-    //   ...status,
-    //   conclusion: 'success',
-    //   completed_at: new Date(),
-    //   output: {
-    //     title: 'Successful Validation',
-    //     summary: `Congrats, all your commits are signed!`
-    //   }
-    // }
-
-    // return octokit.rest.checks.create(successStatus)
-
-     core.setOutput("Success", "All your commits are signed")
+    core.setOutput("Success", "All your commits are signed")
 
   }
 
   const createCheckErrorForFailedAction = () => {
-    const failedCheck = {
-      ...status,
-      conclusion: 'failure',
-      completed_at: new Date(),
-      output: {
-        title: 'Failed Validation',
-        summary: 'Please, make sure you are using the correct configuration for this action. https://github.com/ZupIT/zup-dco-validator'
-      }
-    }
-
-    return octokit.rest.checks.create(failedCheck)
+    core.setOutput('Please, make sure you are using the correct configuration for this action. https://github.com/ZupIT/zup-dco-validator')
   }
 
   const start = async () => {
@@ -6290,17 +6273,12 @@ const validateCommitSignatures = () => {
       let notSignedCommits = []
       let notGpgVerifiedCommits = []
 
-
       const { data: prCommits } = await loadCommitsForPullRequest(pr.commits_url)
 
       notSignedCommits = checkCommitsSignOff(prCommits)
-      console.log('NOT SIGNED COMMITS', notSignedCommits)
-
 
       if (shouldVerifyGpg)
         notGpgVerifiedCommits = checkCommitsGpgVerification(prCommits)
-
-      console.log('NOT GPG VERIFIED COMMITS', notGpgVerifiedCommits)
 
       if (notSignedCommits.length || notGpgVerifiedCommits.length)
         createFailedCheckVerification(notSignedCommits, notGpgVerifiedCommits)
