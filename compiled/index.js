@@ -6238,22 +6238,20 @@ const validateCommitSignatures = () => {
     `
     core.setFailed(message)
 
-    try {
-      const failureStatus = {
-        ...status,
-        conclusion: 'failure',
-        completed_at: new Date(),
-        output: {
-          title: 'Failed Validation - Problems were found in some of your commits',
-          summary: message
-        }
+
+    const failureStatus = {
+      ...status,
+      conclusion: 'failure',
+      completed_at: new Date(),
+      output: {
+        title: 'Failed Validation - Problems were found in some of your commits',
+        summary: message
       }
-
-      octokit.rest.checks.create(failureStatus)
-
-    } catch (error) {
-      core.setFailed("Verification finished")
     }
+
+    octokit.rest.checks.create(failureStatus).catch(() => {
+      core.setFailed("Verification finished")
+    })
 
   }
 
