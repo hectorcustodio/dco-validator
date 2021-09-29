@@ -6258,7 +6258,7 @@ const validateCommitSignatures = () => {
 
   const createSuccessCheckVerification = () => {
 
-    core.setOutput("Success", "All your commits are signed")
+    core.info("Success", "All your commits are signed")
 
   }
 
@@ -6281,9 +6281,9 @@ const validateCommitSignatures = () => {
       notGpgVerifiedCommits = checkCommitsGpgVerification(prCommits)
 
     if (notSignedCommits.length || notGpgVerifiedCommits.length)
-      createFailedCheckVerification(notSignedCommits, notGpgVerifiedCommits)
+      return createFailedCheckVerification(notSignedCommits, notGpgVerifiedCommits)
 
-    createSuccessCheckVerification()
+    return createSuccessCheckVerification()
 
   }
 
