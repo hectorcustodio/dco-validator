@@ -21,6 +21,7 @@ const validateCommitSignatures = () => {
     const re = /(Signed-off-by:\s*)(.+)<(.+@.+)>/
 
     return commits.filter((commit) => {
+      console.log("COmmit", commit)
       const { commit: commitDetail } = commit
       const match = re.exec(commitDetail.message)
       if (!match) return commit
@@ -42,7 +43,7 @@ const validateCommitSignatures = () => {
 
     const [notSigned, notVerified] = failedCommits
 
-    const message = `${notSigned.length ? `Some commits are incorrectly signed off :
+    const message = `${notSigned.length ? `\n Some commits are incorrectly signed off :
       ${notSigned.map(commitSha => `\n ${commitSha}`).join(' ')}` : ''}
     ${notVerified.length ? `\nGPG Verification not found for some commits :
       ${notVerified.map(commitSha => `\n ${commitSha}`).join(' ')}` : ''}
@@ -52,9 +53,7 @@ const validateCommitSignatures = () => {
   }
 
   const createSuccessCheckVerification = () => {
-
     core.info("Congratulations!!! All your commits are signed")
-
   }
 
   const createCheckErrorForFailedAction = () => {
