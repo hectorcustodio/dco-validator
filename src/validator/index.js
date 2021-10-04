@@ -23,9 +23,11 @@ const validateCommitSignatures = () => {
 
     return commits.map((commit) => {
       console.log("COmmit", commit)
-      const { commit: commitDetail } = commit
+      const { commit: commitDetail, parents } = commit
       const authorName = commitDetail.author.name
       const authorEmail = commitDetail.author.email
+
+      if (parents.length === 2) return null
 
       if (authorsToSkip.includes(authorName)) return null
 
