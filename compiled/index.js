@@ -6197,7 +6197,7 @@ const validateCommitSignatures = () => {
   const checkCommitsSignOff = (commits) => {
     const re = /(Signed-off-by:\s*)(.+)<(.+@.+)>/
 
-    return commits.map((commit) => {
+    return commits.filter((commit) => {
       const { commit: commitDetail, parents } = commit
       const authorName = commitDetail.author.name
       const authorEmail = commitDetail.author.email
