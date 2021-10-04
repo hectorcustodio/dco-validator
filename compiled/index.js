@@ -6198,11 +6198,11 @@ const validateCommitSignatures = () => {
     const re = /(Signed-off-by:\s*)(.+)<(.+@.+)>/
 
     return commits.map((commit) => {
-      console.log("Parents", parents)
       const { commit: commitDetail, parents } = commit
       const authorName = commitDetail.author.name
       const authorEmail = commitDetail.author.email
 
+      console.log("Parents", parents)
       if (parents.length === 2) return null
 
       if (authorsToSkip.split(",").includes(authorName)) return null
