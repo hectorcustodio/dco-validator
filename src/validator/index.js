@@ -21,7 +21,7 @@ const validateCommitSignatures = () => {
   const checkCommitsSignOff = (commits) => {
     const re = /(Signed-off-by:\s*)(.+)<(.+@.+)>/
 
-    return commits.filter((commit) => {
+    return commits.map((commit) => {
       console.log("COmmit", commit)
       const { commit: commitDetail } = commit
       const authorName = commitDetail.author.name
