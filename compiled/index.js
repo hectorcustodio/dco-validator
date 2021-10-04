@@ -6178,6 +6178,7 @@ const github = __nccwpck_require__(5438);
 const core = __nccwpck_require__(2186);
 
 const validateCommitSignatures = () => {
+  const authorsToSkip = process.env.SKIP_AUTHORS || ""
   const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
   let { payload, eventName } = github.context
   const { pull_request: pr } = payload
@@ -6196,16 +6197,22 @@ const validateCommitSignatures = () => {
   const checkCommitsSignOff = (commits) => {
     const re = /(Signed-off-by:\s*)(.+)<(.+@.+)>/
 
-    return commits.filter((commit) => {
-      console.log("COmmit", commit)
-      const { commit: commitDetail } = commit
+    return commits.map((commit) => {
+      console.log("Parents", parents)
+      const { commit: commitDetail, parents } = commit
+      const authorName = commitDetail.author.name
+      const authorEmail = commitDetail.author.email
+
+      if (parents.length === 2) return null
+
+      if (authorsToSkip.split(",").includes(authorName)) return null
+
       const match = re.exec(commitDetail.message)
       if (!match) return commit
 
-
       const [_full, _sign, author, email] = match
 
-      if (commitDetail.author.name !== author.trim() || commitDetail.author.email !== email)
+      if (authorName !== author.trim() || authorEmail !== email)
         return commit
 
       return null

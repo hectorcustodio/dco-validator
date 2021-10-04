@@ -2,7 +2,7 @@ const github = require('@actions/github');
 const core = require('@actions/core');
 
 const validateCommitSignatures = () => {
-  const authorsToSkip = process.env.SKIP_AUTHORS || []
+  const authorsToSkip = process.env.SKIP_AUTHORS || ""
   const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
   let { payload, eventName } = github.context
   const { pull_request: pr } = payload
@@ -22,14 +22,14 @@ const validateCommitSignatures = () => {
     const re = /(Signed-off-by:\s*)(.+)<(.+@.+)>/
 
     return commits.map((commit) => {
-      console.log("COmmit", commit)
+      console.log("Parents", parents)
       const { commit: commitDetail, parents } = commit
       const authorName = commitDetail.author.name
       const authorEmail = commitDetail.author.email
 
       if (parents.length === 2) return null
 
-      if (authorsToSkip.includes(authorName)) return null
+      if (authorsToSkip.split(",").includes(authorName)) return null
 
       const match = re.exec(commitDetail.message)
       if (!match) return commit
