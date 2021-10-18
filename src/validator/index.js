@@ -19,20 +19,20 @@ const validateCommitSignatures = () => {
     const re = /(Signed-off-by:\s*)(.+)<(.+@.+)>/
 
     return commits.filter((commit) => {
-      const { commit: commitDetail, parents } = commit
-      const authorName = commitDetail.author.name
-      const authorEmail = commitDetail.author.email
+      const { author, message, parents } = commit
+      const authorName = author.name
+      const authorEmail = author.email
 
-      if (parents.length === 2) return null
+      if (parents && parents.length === 2) return null
 
       if (authorsToSkip.split(",").includes(authorName)) return null
 
-      const match = re.exec(commitDetail.message)
+      const match = re.exec(message)
       if (!match) return commit
 
-      const [_full, _sign, author, email] = match
+      const [_full, _sign, signedAuthor, signedEmail] = match
 
-      if (authorName !== author.trim() || authorEmail !== email)
+      if (authorName !== signedAuthor.trim() || authorEmail !== signedEmail)
         return commit
 
       return null
@@ -76,30 +76,28 @@ const validateCommitSignatures = () => {
       const { pull_request: pr } = payload
       console.log("PR", pr)
       const { data: prCommits } = await loadCommitsForPullRequest(pr.commits_url)
-      commits = prCommits.map(item => item.commit) // github API return an object with the commit key
+      commits = prCommits.map(item => ({...item.commit, sha: item.sha})) // github API return an object with the 'commit' key
       console.log("PR commits", commits)
     }
 
     if (eventName === 'push') {
-      commits = payload.commits
+      commits = payload.commits.map(item => ({...item, sha: item.id}))
       console.log("PUSH commits", commits)
     }
 
     console.log("Payload", payload)
 
-    // const { data: prCommits } = await loadCommitsForPullRequest(pr.commits_url)
-
     if (!commits) return createCheckErrorForFailedAction()
 
-    // notSignedCommits = checkCommitsSignOff(commits)
+    notSignedCommits = checkCommitsSignOff(commits)
 
     // if (shouldVerifyGpg === 'true')
     //   notGpgVerifiedCommits = checkCommitsGpgVerification(commits)
 
-    // if (notSignedCommits.length || notGpgVerifiedCommits.length)
-    //   return createFailedCheckVerification(notSignedCommits, notGpgVerifiedCommits)
+    if (notSignedCommits.length || notGpgVerifiedCommits.length)
+      return createFailedCheckVerification(notSignedCommits, notGpgVerifiedCommits)
 
-    // return createSuccessCheckVerification()
+    return createSuccessCheckVerification()
 
   }
 
