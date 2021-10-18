@@ -23,6 +23,8 @@ const validateCommitSignatures = () => {
       const authorName = author.name
       const authorEmail = author.email
 
+      console.log('Commit', commit)
+
       if (parents && parents.length === 2) return null
 
       if (authorsToSkip.split(",").includes(authorName)) return null
@@ -74,7 +76,7 @@ const validateCommitSignatures = () => {
     if (eventName === 'pull_request') {
       const { pull_request: pr } = payload
       const { data: prCommits } = await loadCommitsForPullRequest(pr.commits_url)
-      commits = prCommits.map(item => ({ ...item.commit, sha: item.sha })) // github API return an object with the 'commit' key
+      commits = prCommits.map(item => ({ ...item.commit, sha: item.sha, parents: item.parents })) // github API return an object with the 'commit' key
     }
 
     if (eventName === 'push') {
