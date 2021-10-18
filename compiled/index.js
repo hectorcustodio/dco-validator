@@ -6214,7 +6214,7 @@ const validateCommitSignatures = () => {
     return commits
       .filter(({ author }) => !authorsToSkip.split(',').includes(author.name))
       .filter(({ parents }) => parents && !(parents.length === 2))
-      .map(({ author, message, sha }) => {
+      .flatMap(({ author, message, sha }) => {
         const match = re.exec(message)
         if (!match) return sha
 
@@ -6222,6 +6222,8 @@ const validateCommitSignatures = () => {
 
         if (author.name !== signedAuthor.trim() || author.email !== signedEmail)
           return sha
+
+        return []
       })
 
     // return commits.filter((commit) => {
