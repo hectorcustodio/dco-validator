@@ -6197,8 +6197,7 @@ const validateCommitSignatures = () => {
     let step_A = commits.filter(({ author }) => (!authorsToSkip.split(',').includes(author.name)))
     console.log("A", step_A.map((item) => item.parents))
     let step_B = step_A.filter(({ parents }) => {
-      console.log("PARENTS", parents, parents.length)
-      return (parents && !parents.length === 2)
+      return (parents && !(parents.length === 2))
     })
     console.log("B", step_B)
     let step_C = step_B.map(({ author, message, sha }) => {
@@ -6216,7 +6215,7 @@ const validateCommitSignatures = () => {
 
     return commits
       .filter(({ author }) => !authorsToSkip.split(',').includes(author.name))
-      .filter(({ parents }) => parents && !parents.length === 2)
+      .filter(({ parents }) => parents && !(parents.length === 2))
       .map(({ author, message, sha }) => {
         const match = re.exec(message)
         if (!match) return sha
