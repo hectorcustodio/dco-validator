@@ -2,7 +2,7 @@ const github = require('@actions/github');
 const core = require('@actions/core');
 
 const validateCommitSignatures = () => {
-  const authorsToSkip = process.env.SKIP_AUTHORS || ""
+  const authorsToSkip = process.env.SKIP_AUTHORS || []
   const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
 
   const loadCommitsForPullRequest = (commitsUrl) => {

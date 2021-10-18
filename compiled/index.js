@@ -6178,7 +6178,7 @@ const github = __nccwpck_require__(5438);
 const core = __nccwpck_require__(2186);
 
 const validateCommitSignatures = () => {
-  const authorsToSkip = process.env.SKIP_AUTHORS || ""
+  const authorsToSkip = process.env.SKIP_AUTHORS || []
   const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
 
   const loadCommitsForPullRequest = (commitsUrl) => {
