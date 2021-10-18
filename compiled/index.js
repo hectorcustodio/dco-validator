@@ -6194,34 +6194,17 @@ const validateCommitSignatures = () => {
   const checkCommitsSignOff = (commits) => {
     const re = /(Signed-off-by:\s*)(.+)<(.+@.+)>/
 
-    let step_A = commits.filter(({ author }) => (!authorsToSkip.split(',').includes(author.name)))
-    console.log("A", step_A.map((item) => item.parents))
-    let step_B = step_A.filter(({ parents }) => {
-      return (parents && !(parents.length === 2))
-    })
-    console.log("B", step_B)
-    let step_C = step_B.map(({ author, message, sha }) => {
-      const match = re.exec(message)
-      if (!match) return sha
-
-      const [_full, _sign, signedAuthor, signedEmail] = match
-
-      if (author.name !== signedAuthor.trim() || author.email !== signedEmail)
-        return sha
-    })
-    console.log("C", step_C)
-
     return commits
       .filter(({ author }) => !authorsToSkip.split(',').includes(author.name))
       .filter(({ parents }) => parents && !(parents.length === 2))
       .flatMap(({ author, message, sha }) => {
         const match = re.exec(message)
-        if (!match) return sha
+        if (!match) return [sha]
 
         const [_full, _sign, signedAuthor, signedEmail] = match
 
         if (author.name !== signedAuthor.trim() || author.email !== signedEmail)
-          return sha
+          return [sha]
 
         return []
       })
