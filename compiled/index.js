@@ -6180,9 +6180,6 @@ const core = __nccwpck_require__(2186);
 const validateCommitSignatures = () => {
   const authorsToSkip = process.env.SKIP_AUTHORS || ""
   const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
-  let { payload, eventName } = github.context
-  const { pull_request: pr } = payload
-
 
   const loadCommitsForPullRequest = (commitsUrl) => {
     return octokit.request({ method: "GET", url: commitsUrl })
@@ -6244,28 +6241,29 @@ const validateCommitSignatures = () => {
 
   const start = async () => {
     const shouldVerifyGpg = process.env.VALIDATE_GPG || false
+    let { payload, eventName } = github.context
+    // const { pull_request: pr } = payload
+
     let notSignedCommits = []
     let notGpgVerifiedCommits = []
 
-    const { data: prCommits } = await loadCommitsForPullRequest(pr.commits_url)
+    console.log("Payload", payload)
 
-    notSignedCommits = checkCommitsSignOff(prCommits)
+    // const { data: prCommits } = await loadCommitsForPullRequest(pr.commits_url)
 
-    if (shouldVerifyGpg === 'true')
-      notGpgVerifiedCommits = checkCommitsGpgVerification(prCommits)
+    // notSignedCommits = checkCommitsSignOff(prCommits)
 
-    if (notSignedCommits.length || notGpgVerifiedCommits.length)
-      return createFailedCheckVerification(notSignedCommits, notGpgVerifiedCommits)
+    // if (shouldVerifyGpg === 'true')
+    //   notGpgVerifiedCommits = checkCommitsGpgVerification(prCommits)
 
-    return createSuccessCheckVerification()
+    // if (notSignedCommits.length || notGpgVerifiedCommits.length)
+    //   return createFailedCheckVerification(notSignedCommits, notGpgVerifiedCommits)
+
+    // return createSuccessCheckVerification()
 
   }
 
-  if (eventName === 'pull_request') {
-    start()
-  } else {
-    createCheckErrorForFailedAction()
-  }
+  start()
 
 
 }
