@@ -19,7 +19,7 @@ const validateCommitSignatures = () => {
     const re = /(Signed-off-by:\s*)(.+)<(.+@.+)>/
 
     let step_A = commits.filter(({ author }) => (!authorsToSkip.split(',').includes(author.name)))
-    console.log("A", step_A)
+    console.log("A", step_A.map((item)=> item.parents))
     let step_B = step_A.filter(({ parents }) => (parents && !parents.length === 2))
     console.log("B", step_B)
     let step_C = step_B.map(({ author, message, sha }) => {
@@ -103,7 +103,7 @@ const validateCommitSignatures = () => {
     if (eventName === 'pull_request') {
       const { pull_request: pr } = payload
       const { data: prCommits } = await loadCommitsForPullRequest(pr.commits_url)
-      return prCommits.map(item => ({ ...item.commit, sha: item.sha, parents: item.parents })) // github API return an object with the 'commit' key
+      return prCommits.map(item => ({ ...item.commit, sha: item.sha, parents: [...item.parents] })) // github API return an object with the 'commit' key
     }
 
     if (eventName === 'push') {
