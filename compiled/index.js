@@ -6187,7 +6187,7 @@ const validateCommitSignatures = () => {
 
   const checkCommitsGpgVerification = (commits) => {
     return commits
-      .filter(({ commit }) => !commit.verification.verified)
+      .filter((commit) => !commit.verification.verified)
       .map((commit) => commit.sha)
   }
 
@@ -6242,7 +6242,6 @@ const validateCommitSignatures = () => {
   const start = async () => {
     const shouldVerifyGpg = process.env.VALIDATE_GPG || false
     let { payload, eventName } = github.context
-    // const { pull_request: pr } = payload
 
     let notSignedCommits = []
     let notGpgVerifiedCommits = []
@@ -6250,25 +6249,20 @@ const validateCommitSignatures = () => {
 
     if (eventName === 'pull_request') {
       const { pull_request: pr } = payload
-      console.log("PR", pr)
       const { data: prCommits } = await loadCommitsForPullRequest(pr.commits_url)
-      commits = prCommits.map(item => ({...item.commit, sha: item.sha})) // github API return an object with the 'commit' key
-      console.log("PR commits", commits)
+      commits = prCommits.map(item => ({ ...item.commit, sha: item.sha })) // github API return an object with the 'commit' key
     }
 
     if (eventName === 'push') {
-      commits = payload.commits.map(item => ({...item, sha: item.id}))
-      console.log("PUSH commits", commits)
+      commits = payload.commits.map(item => ({ ...item, sha: item.id }))
     }
-
-    console.log("Payload", payload)
 
     if (!commits) return createCheckErrorForFailedAction()
 
     notSignedCommits = checkCommitsSignOff(commits)
 
-    // if (shouldVerifyGpg === 'true')
-    //   notGpgVerifiedCommits = checkCommitsGpgVerification(commits)
+    if (shouldVerifyGpg === 'true' && eventName === "pull_request")
+      notGpgVerifiedCommits = checkCommitsGpgVerification(commits)
 
     if (notSignedCommits.length || notGpgVerifiedCommits.length)
       return createFailedCheckVerification(notSignedCommits, notGpgVerifiedCommits)
