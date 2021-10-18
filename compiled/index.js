@@ -6194,28 +6194,43 @@ const validateCommitSignatures = () => {
   const checkCommitsSignOff = (commits) => {
     const re = /(Signed-off-by:\s*)(.+)<(.+@.+)>/
 
-    return commits.filter((commit) => {
-      const { author, message, parents } = commit
-      const authorName = author.name
-      const authorEmail = author.email
+    return commits
+      .filter(({ author }) => !authorsToSkip.split(',').includes(author.name))
+      .filter(({ parents }) => parents && !parents.length === 2)
+      .map(({ author, message, sha }) => {
+        const match = re.exec(message)
+        if (!match) return sha
 
-      console.log('Commit', commit)
+        const [_full, _sign, signedAuthor, signedEmail] = match
 
-      if (parents && parents.length === 2) return null
+        if (author.name !== signedAuthor.trim() || author.email !== signedEmail)
+          return sha
 
-      if (authorsToSkip.split(",").includes(authorName)) return null
+        return null
+      })
 
-      const match = re.exec(message)
-      if (!match) return commit
+    // return commits.filter((commit) => {
+    //   const { author, message, parents } = commit
+    //   const authorName = author.name
+    //   const authorEmail = author.email
 
-      const [_full, _sign, signedAuthor, signedEmail] = match
+    //   console.log('Commit', commit)
 
-      if (authorName !== signedAuthor.trim() || authorEmail !== signedEmail)
-        return commit
+    //   if (parents && parents.length === 2) return null
 
-      return null
+    //   if (authorsToSkip.split(",").includes(authorName)) return null
 
-    }).map(commit => commit.sha)
+    //   const match = re.exec(message)
+    //   if (!match) return commit
+
+    //   const [_full, _sign, signedAuthor, signedEmail] = match
+
+    //   if (authorName !== signedAuthor.trim() || authorEmail !== signedEmail)
+    //     return commit
+
+    //   return null
+
+    // }).map(commit => commit.sha)
 
   }
 
@@ -6251,7 +6266,7 @@ const validateCommitSignatures = () => {
     }
 
     if (eventName === 'push') {
-      return payload.commits.map(item => ({ ...item, sha: item.id }))
+      return payload.commits.map(item => ({ ...item, sha: item.id, parents: [] }))
     }
 
     return
@@ -6264,8 +6279,6 @@ const validateCommitSignatures = () => {
     let notSignedCommits = []
     let notGpgVerifiedCommits = []
     let commits = await filterCommitsForEvent()
-
-    console.log('Commits', commits)
 
     if (!commits) return createCheckErrorForFailedAction()
 
