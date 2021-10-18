@@ -6246,20 +6246,33 @@ const validateCommitSignatures = () => {
 
     let notSignedCommits = []
     let notGpgVerifiedCommits = []
+    let commits
+
+    if (eventName === 'pull_request'){
+      const { pull_request: pr } = payload
+      const { data: prCommits } = await loadCommitsForPullRequest(pr.commits_url)
+      commits = prCommits
+    }
+
+    if (eventName === 'push'){
+      commits = payload.commits
+    }
 
     console.log("Payload", payload)
 
     // const { data: prCommits } = await loadCommitsForPullRequest(pr.commits_url)
 
-    // notSignedCommits = checkCommitsSignOff(prCommits)
+    if (!commits) return createCheckErrorForFailedAction()
 
-    // if (shouldVerifyGpg === 'true')
-    //   notGpgVerifiedCommits = checkCommitsGpgVerification(prCommits)
+    notSignedCommits = checkCommitsSignOff(commits)
 
-    // if (notSignedCommits.length || notGpgVerifiedCommits.length)
-    //   return createFailedCheckVerification(notSignedCommits, notGpgVerifiedCommits)
+    if (shouldVerifyGpg === 'true')
+      notGpgVerifiedCommits = checkCommitsGpgVerification(commits)
 
-    // return createSuccessCheckVerification()
+    if (notSignedCommits.length || notGpgVerifiedCommits.length)
+      return createFailedCheckVerification(notSignedCommits, notGpgVerifiedCommits)
+
+    return createSuccessCheckVerification()
 
   }
 
