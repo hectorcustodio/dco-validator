@@ -78,7 +78,7 @@ const validateCommitSignatures = () => {
       return payload.commits.map(item => ({ ...item, sha: item.id }))
     }
 
-    return
+    return null
 
   }
 
@@ -88,6 +88,8 @@ const validateCommitSignatures = () => {
     let notSignedCommits = []
     let notGpgVerifiedCommits = []
     let commits = filterCommitsForEvent()
+
+    console.log('Commits', commits)
 
     if (!commits) return createCheckErrorForFailedAction()
 
