@@ -2,7 +2,7 @@ const github = require('@actions/github');
 const core = require('@actions/core');
 
 const validateCommitSignatures = () => {
-  const authorsToSkip = process.env.SKIP_AUTHORS || []
+  const authorsToSkip = process.env.SKIP_AUTHORS || " "
   const octokit = github.getOctokit(process.env.GITHUB_TOKEN)
 
   const loadCommitsForPullRequest = (commitsUrl) => {
@@ -18,9 +18,9 @@ const validateCommitSignatures = () => {
   const checkCommitsSignOff = (commits) => {
     const re = /(Signed-off-by:\s*)(.+)<(.+@.+)>/
 
-    let step_A = commits.filter(({ author }) => !authorsToSkip.split(',').includes(author.name))
+    let step_A = commits.filter(({ author }) => (!authorsToSkip.split(',').includes(author.name)))
     console.log("A", step_A)
-    let step_B = step_A.filter(({ parents }) => parents && !parents.length === 2)
+    let step_B = step_A.filter(({ parents }) => (parents && !parents.length === 2))
     console.log("B", step_B)
     let step_C = step_B.map(({ author, message, sha }) => {
       const match = re.exec(message)
