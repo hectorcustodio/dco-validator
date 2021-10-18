@@ -6242,7 +6242,7 @@ const validateCommitSignatures = () => {
   }
 
   const filterCommitsForEvent = async () => {
-    let { payload, eventName } = github.context
+    const { payload, eventName } = github.context
 
     if (eventName === 'pull_request') {
       const { pull_request: pr } = payload
