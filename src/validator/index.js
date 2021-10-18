@@ -80,8 +80,8 @@ const validateCommitSignatures = () => {
     core.setFailed('Validation error. Please, make sure you are using the correct configuration for this action. https://github.com/ZupIT/zup-dco-validator')
   }
 
-  const filterCommitsForEvent = async () => {
-    const { payload, eventName } = github.context
+  const filterCommitsForEvent = async (eventName) => {
+    const { payload } = github.context
 
     if (eventName === 'pull_request') {
       const { pull_request: pr } = payload
@@ -99,10 +99,11 @@ const validateCommitSignatures = () => {
 
   const start = async () => {
     const shouldVerifyGpg = process.env.VALIDATE_GPG || false
+    const { eventName } = github.context
 
     let notSignedCommits = []
     let notGpgVerifiedCommits = []
-    let commits = await filterCommitsForEvent()
+    let commits = await filterCommitsForEvent(eventName)
 
     if (!commits) return createCheckErrorForFailedAction()
 
