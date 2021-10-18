@@ -6254,16 +6254,16 @@ const validateCommitSignatures = () => {
       return payload.commits.map(item => ({ ...item, sha: item.id }))
     }
 
-    return null
+    return
 
   }
 
-  const start = () => {
+  const start = async () => {
     const shouldVerifyGpg = process.env.VALIDATE_GPG || false
 
     let notSignedCommits = []
     let notGpgVerifiedCommits = []
-    let commits = filterCommitsForEvent()
+    let commits = await filterCommitsForEvent()
 
     console.log('Commits', commits)
 
