@@ -6209,7 +6209,7 @@ const validateCommitSignatures = () => {
       if (author.name !== signedAuthor.trim() || author.email !== signedEmail)
         return sha
 
-      return null
+      return
     })
     console.log("C", step_C)
 
@@ -6225,7 +6225,7 @@ const validateCommitSignatures = () => {
         if (author.name !== signedAuthor.trim() || author.email !== signedEmail)
           return sha
 
-        return null
+        return
       })
 
     // return commits.filter((commit) => {
