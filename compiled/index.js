@@ -6187,6 +6187,7 @@ const validateCommitSignatures = () => {
 
   const checkCommitsGpgVerification = (commits) => {
     return commits
+      .filter(({ author }) => !authorsToSkip.split(',').includes(author.name))
       .filter((commit) => !commit.verification.verified)
       .map((commit) => commit.sha)
   }
@@ -6208,30 +6209,6 @@ const validateCommitSignatures = () => {
 
         return []
       })
-
-    // return commits.filter((commit) => {
-    //   const { author, message, parents } = commit
-    //   const authorName = author.name
-    //   const authorEmail = author.email
-
-    //   console.log('Commit', commit)
-
-    //   if (parents && parents.length === 2) return null
-
-    //   if (authorsToSkip.split(",").includes(authorName)) return null
-
-    //   const match = re.exec(message)
-    //   if (!match) return commit
-
-    //   const [_full, _sign, signedAuthor, signedEmail] = match
-
-    //   if (authorName !== signedAuthor.trim() || authorEmail !== signedEmail)
-    //     return commit
-
-    //   return null
-
-    // }).map(commit => commit.sha)
-
   }
 
 
@@ -6239,7 +6216,7 @@ const validateCommitSignatures = () => {
 
     const [notSigned, notVerified] = failedCommits
 
-    const message = `${notSigned.length ? `\n Some commits are incorrectly signed off :
+    const message = `${notSigned.length ? `\nSome commits are incorrectly signed off :
       ${notSigned.map(commitSha => `\n ${commitSha}`).join(' ')}` : ''}
     ${notVerified.length ? `\nGPG Verification not found for some commits :
       ${notVerified.map(commitSha => `\n ${commitSha}`).join(' ')}` : ''}
