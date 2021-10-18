@@ -76,7 +76,7 @@ const validateCommitSignatures = () => {
       const { pull_request: pr } = payload
       console.log("PR", pr)
       const { data: prCommits } = await loadCommitsForPullRequest(pr.commits_url)
-      commits = prCommits
+      commits = prCommits.map(item => item.commit) // github API return an object with the commit key
       console.log("PR commits", commits)
     }
 
